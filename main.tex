@@ -1,0 +1,664 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+\usepackage{amsmath}
+\usepackage{ctex}
+\newcommand{\D}[0]{\mathrm{d}}
+\renewcommand{\I}[0]{\mathrm{i}}
+\usepackage{tikz}
+\usepackage{braket}
+\usepackage{xcolor}
+\usepackage{cancel}
+\usepackage{geometry}
+\geometry{
+  a4paper,           % 纸张大小
+  left=1cm,          % 左边距
+  right=3cm,         % 右边距
+  top=2.5cm,         % 上边距
+  bottom=2.5cm,      % 下边距
+  headheight=0.5cm,  % 页眉高度
+  headsep=0.5cm,     % 页眉与正文间距
+  footskip=0.5cm     % 页脚与正文间距
+}
+\setlength{\displaywidth}{\textwidth}
+\usepackage[hidelinks]{hyperref}% 超链接
+\renewcommand{\exp}[1]{\operatorname{exp}\left\{#1\right\}}
+
+\definecolor{bgblue}{RGB}{68,84,106}
+\title{Draft}
+\author{dj l}
+\date{November 2024}
+
+\begin{document}
+\section{在谐振子与谐振子热库模型中利用Influence Functional推导主方程}
+谐振子自由度x，谐振子热库自由度$q_i$. Assume the bath has a temperature $\beta$.
+\begin{align}
+    S[x,q]=S[x]+S[q_i]+S_I[x,q_i]\\
+    S[x]=\int_0^t ds \frac{1}{2}M\dot{x}^2-\frac{1}{2}M\Omega^2 x^2,\\
+    S[q_i]=\int_0^tds\frac{1}{2}m_i \dot{q}_i^2-\frac{1}{2}m_i\omega_i^2q_i^2,\\
+    S_I[x,q_i]=-\int ds \sum_i c_i x*q_i.
+\end{align}
+\subsection{影响泛函的具体形式}
+Our system and bath interaction action is $S[x,q]$.
+\begin{align*}
+     \rho_r(x_f,x_f',t)=\int dx_i\int dx_i' J_r(x_f,x_f'|x_i,x_i,t)\rho_r(x_i,x_i',0)\\
+     J_r(x_f,x_f'|x_i,x_i,t)=\int \mathcal{D}x\int\mathcal{D}x' e^{\mathrm{i}(S[x(s)]-S[x'(s)]+\delta A[x,x'])}
+\end{align*}
+And I need to figure out the form of $\delta A$.
+\subsection{热库自由度$q_i$的关联函数}
+\begin{equation}
+    \braket{q_n q_m}_\beta
+\end{equation}
+Define collected coordinate $ Q(s)=\sum_n c_n q_n(s)$, because it interacts with system coordinate $x$ with the form $x(s)\sum_n c_n q_n(s)= x(s)Q(s)$.\\
+In the case of ocassilator bath, $\braket{Q}_\beta=0$. No shift, and disconnect correlation function equal to connect correlation function.
+% \begin{widetext}
+\begin{equation}
+    \begin{split}
+         \braket{Q(s) Q(s')}_\beta=\int_0^\infty d\omega J(\omega)\left[\coth(\frac{\beta\hbar\omega}{2})\cos(\omega(s-s')
+             )-\mathrm{i}\sin\omega(s-s')\right]\\
+             =\nu(s-s')+\mathrm{i}\eta(s-s')\\
+             J(\omega)=\sum_n\delta(\omega-\omega_n)\frac{c_n^2}{2m\omega_n}\label{eq:correlation function}
+    \end{split}
+\end{equation}
+% \end{widetext}
+The real part of the correlation function is fluctuation kernel, and the imaginary part is dissipation kernel $\eta(s-s')=\operatorname{Im} \braket{Q(s) Q(s')}_\beta$. 
+
+This structure origins from the average on reservoir DOF: $\braket{\exp{\left(\mathrm{i}\int x(s)Q(s)-x'(s)Q'(s)\right)}}_{Q,Q'}=\exp{(\mathrm{i}\delta A[x,x'])}$
+% \begin{widetext}
+    \begin{equation}
+        \begin{split}
+             \delta A[x,x']=-\int_0^t ds  [x(s)\braket{Q(s)}-x'(s)\braket{Q'(s)}]+\frac{\mathrm{i}}{2}\int ds\int ds' x(s)\braket{\mathcal{T}Q(s)Q(s')}x(s')+x'(s)\braket{\bar{\mathcal{T}}Q(s)Q(s')}x'(s')\\
+        -x(s)\braket{Q(s')Q(s)}x'(s')-x(s')\braket{Q(s)Q(s')}x'(s)+\cdots\label{eq:influence functional}
+        \end{split}
+    \end{equation}
+    \\
+    \begin{equation}
+        \begin{split}
+             \delta A[x,x']=\mathrm{i}\int_0^t ds\int_0^s ds'(x(s)-x'(s))\nu(s-s')(x(s')-x'(s'))+\mathrm{i}(x(s)-x'(s))\eta(s-s')(x(s')+x'(s'))\\
+        =\mathrm{i}\int_0^t ds_1\int_0^{s_1}ds_2\Delta(s_1)\nu(s_1-s_2)\Delta(s_2)-2\int_0^t ds_1\int_0^{s_1}ds_2\Delta(s_1)\eta(s_1-s
+        _2)\Sigma(s_2)\\
+        \text{where}\quad \Delta(s)=x(s)-x'(s),\Sigma(s)=\frac{x(s)+x'(s)}{2}.\label{eq:influence functional 1}
+        \end{split}
+    \end{equation}
+% \end{widetext}
+Given a symbol $W_+(s-s')=\braket{Q(s) Q(s')}_\beta$, and $W_-(s-s')=\braket{Q(s') Q(s)}_\beta$, which satisfy $W_+(s-s')=W_-(s'-s)$.\\
+In order to get the formula，I split the integral region into two part to make the time-order explicitly. 
+\subsection{利用影响泛函求主方程}
+Main idea:  The master equation is obtained by evaluating $J_r(t+\Delta t)$, subtracting $J_r(t)$, and expanding the difference to first order in $\Delta t$, retaining terms up to $\mathcal{O}(\Delta t)$ while discarding higher-order contributions.
+\subsubsection{插入t时刻中间坐标$x_m,x_m'$}
+Spit the trajectory into two part $\bar{x},\tilde{x}$.
+Integrate $\tilde{x}$ with line approximation:$\tilde{x}(s)=x_m+(x_f-x_m)\frac{s}{\Delta t}$.
+\begin{equation}
+    \int_{0,x_i}^{t+\Delta t,x_f}\mathcal{D} x=\int_{-\infty}^{+\infty}d x_m \int_{0,x_i}^{t,x_m}\mathcal{D}\bar{x}\int_{t,x_m}^{t+\Delta t,x_f}\mathcal{D}\tilde{x}
+\end{equation}
+% \begin{widetext}
+    \begin{equation}
+        \begin{split}
+          J_r(t+\Delta t;x_f,x_f')=N(t)\int_{0}^\infty dx_m\int_{0}^\infty dx_m'\exp{[\mathrm{i}\frac{M}{2\Delta t}((x_f-x_m)^2-(x_f'-x_m')^2)]}\cdot\left[1-\mathrm{i}\Delta t (V(x_f)- V(x_f'))\right]\\\cdot \int_i^m \mathcal{D}\bar{x}\mathcal{D}\bar{x}' \exp{[\mathrm{i}(S[\bar{x}]-S[\bar{x}'])]}\exp{[\mathrm{i}\delta A[\bar{x},\bar{x}',\tilde{x},\tilde{x}']]}   
+        \end{split}\label{eq:reduced propagator 1}
+    \end{equation}
+% \end{widetext}
+\subsubsection{$\delta A[\bar{x},\bar{x}',\tilde{x},\tilde{x}']$形式}
+% \begin{widetext}
+    \begin{equation}
+        \begin{split}
+             \delta A[\bar{x},\bar{x}',\tilde{x},\tilde{x}']=-2\int_0^{t+\Delta t} ds_1\int_0^{s_1}ds_2\Delta(s_1)\eta(s_1-s_2)\Sigma(s_2)+\mathrm{i}\int_0^{t+\Delta t} ds_1\int_0^{s_1}ds_2\Delta(s_1)\nu(s_1-s_2)\Delta(s_2)\\
+        =-2\int_0^{t} ds_1\int_0^{s_1}ds_2\bar{\Delta}(s_1)\eta(s_1-s_2)\bar{\Sigma}(s_2)-2\int_t^{t+\Delta t} ds_1\int_0^{t}ds_2\tilde{\Delta}(s_1)\eta(s_1-s_2)\bar{\Sigma}(s_2)\\-2\int_t^{t+\Delta t} ds_1\int_t^{s_1}ds_2\tilde{\Delta}(s_1)\eta(s_1-s_2)\tilde{\Sigma}(s_2)+\mathrm{i}\int_0^{t} ds_1\int_0^{s_1}ds_2\bar{\Delta}(s_1)\nu(s_1-s_2)\bar{\Delta}(s_2)\\
+        +\mathrm{i}\int_t^{t+\Delta t} ds_1\int_0^{t}ds_2\tilde{\Delta}(s_1)\nu(s_1-s_2)\bar{\Delta}(s_2)+\mathrm{i}\int_t^{t+\Delta t} ds_1\int_t^{s_1}ds_2\tilde{\Delta}(s_1)\nu(s_1-s_2)\tilde{\Delta}(s_2)
+        \end{split}
+    \end{equation}
+% \end{widetext}
+There are three types of terms: those of order $\mathcal{O}(\Delta t^{0})$, those of order $\mathcal{O}(\Delta t^{1})$, and those of order $\mathcal{O}(\Delta t^{2})$, the latter of which will be neglected because it is higher order of $\Delta t$. Backing to the Reduced propagator $J_r$:
+% \begin{widetext}
+    \begin{equation}
+        \begin{split}
+             J_r(t+\Delta t;x_f,x_f')=N(t)\int_{0}^\infty dx_m\int_{0}^\infty dx_m'\exp{[\mathrm{i}\frac{M}{2\Delta t}((x_f-x_m)^2-(x_f'-x_m')^2)]}\cdot\left[1-\mathrm{i}\Delta t V(x_f)-\mathrm{i}\Delta t V(x_f')\right]\\\cdot \int_i^m \mathcal{D}\bar{x}\mathcal{D}\bar{x}' \exp{[\mathrm{i}\left(
+        S[\bar{x}]-S[\bar{x}']-2\int_0^{t} ds_1\int_0^{s_1}ds_2\bar{\Delta}(s_1)\eta(s_1-s_2)\bar{\Sigma}(s_2)+\mathrm{i}\int_0^{t} ds_1\int_0^{s_1}ds_2\bar{\Delta}(s_1)\nu(s_1-s_2)\bar{\Delta}(s_2)
+        \right)]}\\
+        \cdot\exp{\mathrm{i}\Delta t\left[-2\int_0^t ds\bar{\Sigma}(s)J_{\Sigma}(s)+\mathrm{i}\int_0^{t}ds\bar{\Delta}(s)J_{\Delta}(s)\right]}\\
+        \text{where}\quad J_{\Sigma}(s)=\frac{1}{\Delta t}\int_t^{t+\Delta t} ds_1\tilde{\Delta}(s_1)\eta(s_1-s),J_{\Delta}(s)=\frac{1}{\Delta t}\int_t^{t+\Delta t} ds_1\tilde{\Delta}(s_1)\nu(s_1-s).\label{eq:reduced propagator 0}
+        \end{split}
+    \end{equation}
+% \end{widetext}
+The approximate expressions of the source are  $J_{\Sigma}(s)\approx \frac{1}{2}(\Delta_f+\Delta_m)\eta(t-s)$,$J_\Delta(s)\approx\frac{1}{2}(\Delta_f+\Delta_m)\nu(t-s)$.
+The last could be seen as reduced propagator$J_r(t;x_m,x_m';J_\Delta,J_\Sigma)$ with source.
+I call the $(\Delta t)^0$ part of action $A_0[x,x']$.
+\begin{align*}
+    A_0[\bar{\Sigma},\bar{\Delta}]=\int_0^t ds M(\dot{\bar{\Delta}}\dot{\bar{\Sigma}}-\Omega^2\bar{\Delta}\bar{\Sigma})\\-2\int_0^{t} ds_1\int_0^{s_1}ds_2\bar{\Delta}(s_1)\eta(s_1-s_2)\bar{\Sigma}(s_2)\\+\mathrm{i}\int_0^{t} ds_1\int_0^{s_1}ds_2\bar{\Delta}(s_1)\nu(s_1-s_2)\bar{\Delta}(s_2).
+\end{align*}
+\subsubsection{利用鞍点近似在$\Delta t$阶完成$\bar{x}$积分}
+\begin{align*}
+    \Sigma(s) = \chi_1(s) + \Sigma_{\mathrm{cl}}(s), \qquad \Delta(s) = \chi_2(s) + \Delta_{\mathrm{cl}}(s).
+\end{align*}
+the classical part satisfy equation $\frac{\delta \operatorname{Re}A_0}{\delta(*)}=0$,
+\begin{align}
+    \ddot{\Sigma}_{\mathrm{cl}}(s)+ \Omega^2 \Sigma_{\mathrm{cl}}(s)+ 2 \int_0^s ds' \, \eta(s - s') \Sigma_{\mathrm{cl}}(s')= 0,\label{eq:saddle1}\\
+    \ddot{\Delta}_{\mathrm{cl}}(s)+ \Omega^2 \Delta_{\mathrm{cl}}(s)+ 2 \int_s^t ds' \, \eta(s' - s) \Delta_{\mathrm{cl}}(s')= 0,\label{eq:saddle2}
+\end{align}
+carefully handle the exponential part in $J_r$. Expanding $J_r$ around saddle point $\Sigma_{cl},\Delta_{cl}$.
+% \begin{widetext}
+    \begin{equation}
+        \begin{split}
+             A_0[\Sigma_{cl}+\chi_1,\Delta_{cl}+\chi_2]=A_0[\Sigma_{cl},\Delta_{cl}]+\mathrm{i}\int_0^t ds\int_0^s ds'2\chi_2(s)\nu(s-s')\Delta_{cl}(s')
+        \\+\int_0^t ds M\left[\dot{\chi}_1\dot{\Delta}_{cl}+\dot{\chi}_2\dot{\Sigma}_{cl}-\Omega^2\chi_1\Delta_{cl}-\Omega^2\chi_2\right]-2\int_0^t ds\int_0^s ds'\left[\chi_2(s)\eta(s-s')\Sigma_{cl}(s')+\Delta_{cl}(s)\eta(s-s')\chi_1(s')\right]\\
+        +\int_0^t M[\dot{\chi}_1\dot{\chi}_2-\Omega^2\chi_1\chi_2]-2\int_0^t ds\int_0^s ds'\chi_2(s)\eta(s-s')\chi_1(s')+\mathrm{i}\int_0^t ds\int_0^s ds'\chi_2(s)\nu(s-s')\chi_2(s')\\\text{the second line vanish because the saddle points condition.}
+        \\
+        \delta A[\Sigma,\Delta;\tilde{\Sigma},\tilde{\Delta}]=\Delta t\left[-2\int_0^t dsJ_{\Sigma}(s)(\chi_1(s)+\Sigma_{cl})+\mathrm{i}\int_0^t ds J_{\Delta}(s)(\chi_2(s)+\Delta_{cl}(s))\right]
+        \\ \\
+        J_r[m;i;J_{\Sigma,\Delta}]=\exp{\mathrm{i}(A_0[\Sigma_{cl},\Delta_{cl}]+\delta A[\Sigma_{cl},\Delta_{cl}])}\underbrace{\int_0^0\mathcal{D}\chi_1\int_0^0\mathcal{D}\chi_2\text{quadratic form of} \chi}_{J_r[0,0,t|0,0;\text{source}]}\label{eq:reduced propagator after saddle}
+        \end{split}
+    \end{equation}
+% \end{widetext}
+% \begin{widetext}
+    \begin{align*}
+J_r[0,0,t|0,0;\text{source}]=\int_0^0\mathcal{D}\chi_1\int_0^0\mathcal{D}\chi_2\exp{\mathrm{i}\left[\int_0^t ds_1\int_0^tds_2\frac{1}{2}\chi_i(s_1)\mathcal{O}_{ij}(s_1,s_2)\chi_i(s_2)+\int_0^t ds \chi_iB_i\right]}
+\end{align*}
+\[
+O_{11}(s_1,s_2)=0, \qquad O_{22}(s_1,s_2)=2i\,\nu(s_1,s_2),
+\]
+
+\[
+O_{12}(s_1,s_2)=\left[
+\frac{d^2}{ds_1^2}+\Omega^2\right]\delta(s_1-s_2)+2\theta(s_2-s_1)\,\eta(s_2-s_1),
+\]
+In order to figure out the $O_{12}$, we split the -2 in the third line into $-1-1$. And exchange the variables $s_1,s_2$ in the second $-1$. 
+\[
+O_{21}(s_1,s_2)=\left[\frac{d^2}{ds_1^2}+\Omega^2\right]\delta(s_1-s_2)+2\theta(s_1-s_2)\,\eta(s_1-s_2).
+\]
+\[B_1(s)=-2\Delta t J_\Sigma(s)\qquad B_2(s)=\mathrm{i}\Delta t J_{\Delta}(s)+\mathrm{i}\underbrace{\int_0^s d s'2\nu(s-s')\Delta_{cl}(s')}_{\tilde{J}_\Delta}\]
+Do the Gaussian integral with formula $\int \mathcal{D}\varphi \exp{{\mathrm{i}\int dx\int dy \frac{1}{2}\varphi(x)K(x-y)\varphi(y)+\mathrm{i}\int_x J(x)\varphi(x)}}\propto \exp{-\mathrm{i}\frac{1}{2}\int_x\int_y J(x)K^{-1}(x-y)J(y)}$.
+\begin{align}
+    J_r[0,0,t|0,0;\boldsymbol{B}]=\mathcal{N}\exp{-\mathrm{i}\frac{1}{2}\int_0^t ds\int_0^t ds'B_i(s)G_{ij}(s,s')B_j(s')}
+\end{align}
+where the kernel operator matrix $G_{ij}$ is the reversal of $\mathcal{O}$. And satisfy boundary condition with $\chi$: $G(0,s)=0=G(s,t)=G(s,0)=G(t,s)$. And satisfy Green equation:
+\begin{equation}
+    \begin{split}
+         \int_0^t ds_2 \, O_{12}(s_1, s_2) G_{21}(s_2, s_3) = \delta(s_1 - s_3)\\
+    \left( \partial_{s_1}^2 + \Omega^2 \right) G_{21}(s_1, s_3) + 2 \int_0^{s_1} ds_2 \, \eta(s_1 - s_2) G_{21}(s_2, s_3) = \delta(s_1 - s_3)\\
+    \int_0^t ds_2 \, O_{21}(s_1, s_2) G_{12}(s_2, s_3) = \delta(s_1 - s_3)\\
+    \left( \partial_{s_1}^2 + \Omega^2 \right) G_{12}(s_1, s_3) + 2 \int_{s_1}^t ds_2 \, \eta(s_2 - s_1) G_{12}(s_2, s_3) = \delta(s_1 - s_3)\label{eq:green function}
+    \end{split}
+\end{equation}
+I keep only terms up to $\mathcal{O}(\Delta t)$. The term $B_1 G_{11} B_1$ is of order $(\Delta t)^2$ and is therefore discarded. And the result of $J_r[0,0,t|0,0;\boldsymbol{B}]$ is :
+\begin{align}
+    J_r[0,0,t|0,0;\boldsymbol{B}]=\mathcal{N}\exp{-\frac{1}{2}\Delta t\int_0^t d s_1\int_0^t ds_2J_\Sigma(s_1)(G_{12}(s_1.s_2)+G_{21}(s_2,s_1))\tilde{J}_\Delta(s_2)}
+\end{align}
+\begin{align*}
+    &J_r[m;i;J_{\Sigma,\Delta}]=\underbrace{\mathcal{N}\exp{\mathrm{i}(A_0[\Sigma_{cl},\Delta_{cl}])}}_{\approx J_{r}[x_m,x_m',t;x_i,x_i']}
+    \\&\cdot \exp{\mathrm{i}\Delta t\left[-2\int_0^t ds J_\Sigma(s)\Sigma_{cl}(s)+\mathrm{i}\int_0^tdsJ_\Delta(s)\Delta_{cl}(s)\right]-\frac{1}{2}\Delta t\int_0^t d s_1\int_0^t ds_2J_\Sigma(s_1)(G_{12}(s_1.s_2)+G_{21}(s_2,s_1))\tilde{J}_\Delta(s_2)}
+\end{align*}
+The $x_m,x_m'$ dependence is hidden in $\Sigma_{cl},\Delta_{cl}$. The f dependence is hidden in source $J_{\Sigma/\Delta}$.
+
+% \end{widetext}
+\subsubsection{处理$\Sigma_{cl}$,$\Delta_{cl}$与G}
+I can't solve \eqref{eq:saddle1}\eqref{eq:saddle2} analytically, because they are integro-differential equation with memory kernel. I just make the boundary condition explicitly. 
+Write the solutions of \eqref{eq:saddle1} as $u_1(s)$ and $u_2(s)$ with conditions $u_1(s=0)=1=u_2(s=t);\quad u_1(s=t) = 0 = u_2(s=0)$. 
+In this way , the saddle can be expressed as $\Sigma_{cl}(s)=\Sigma_iu_1(s)+\Sigma_fu_2(s)$.
+And define $v_1(s)=u_2(t-s),v_2(s)=u_1(t-s)$, which is the solution of \eqref{eq:saddle2}. $\Delta_{cl}(s)=\Delta_i v_1(s)+\Delta_m v_2(s)$.
+
+By the way. Without the memory kernel, the saddles are exact, $\Delta_{cl}(s)=\Delta_i\frac{\sin{\Omega(t-s)}}{\sin{\Omega t}}+\Delta_f\frac{\sin{\Omega s}}{\sin{\Omega t}}$.
+
+The green equation \eqref{eq:green function} is similar to \eqref{eq:saddle2}. We can construct solution：
+$G_{12}(s_1, s_2) = [u_1(s_1) u_2(s_2) \theta(s_1 - s_2) - u_2(s_1) u_1(s_2) \theta(s_2 - s_1)] (\dot{u}_1 u_2 - u_1 \dot{u}_2)^{-1} (s_2)$.
+
+\subsubsection{整理$J_r(t+\Delta t)$}
+% \begin{widetext}
+    \begin{align*}
+         J_r(t+\Delta t;x_f,x_f')=N(t)\int_{-\infty}^\infty dx_m\int_{-\infty}^\infty dx_m'\exp{[\mathrm{i}\frac{M}{2\Delta t}(\beta_x^2-\beta_x'^2)]}\cdot\left[1-\mathrm{i}\Delta t V(x_f)-\mathrm{i}\Delta t V(x_f')\right]
+         \cdot J_r(t;x_m,x_m')\\\cdot  \exp{\mathrm{i}\Delta t\left[-2\int_0^t ds J_\Sigma(s)\Sigma_{cl}(s)+\mathrm{i}\int_0^tdsJ_\Delta(s)\Delta_{cl}(s)\right]-\frac{1}{2}\Delta t\int_0^t d s_1\int_0^t ds_2J_\Sigma(s_1)(G_{12}(s_1.s_2)+G_{21}(s_2,s_1))\tilde{J}_\Delta(s_2)}
+    \end{align*}
+    where $\beta_x=x_f-x_m,x_m=x_f-\beta_x$, thus $J_r(t;x_m,x_m')=J_r(t;x_f,x_f')+\frac{\beta_x^2}{2}\partial_{x}^2J_r+\frac{\beta_{x'}^2}{2}\partial_{x_f'}^2J_r$.
+    \begin{equation}
+        \begin{split}
+             \int d\beta_x e^{\mathrm{i}\frac{M}{2\Delta t}\beta_x^2}=\sqrt{\frac{2\pi\mathrm{i}\Delta t}{M}}=N_1,\quad \int d\beta_x e^{\mathrm{i}\frac{M}{2\Delta t}\beta_x^2}\beta_x=0,\quad\int d \beta_x \beta_x^2 e^{\mathrm{i}\frac{M}{2\Delta t}\beta_x^2}=\sqrt{\frac{2\pi \mathrm{i}\Delta t}{M}}\frac{\mathrm{i}\Delta t}{M}\label{Gussian}.\\
+               \int d\beta_x e^{-\mathrm{i}\frac{M}{2\Delta t}\beta_x^2}=\sqrt{\frac{-2\pi\mathrm{i}\Delta t}{M}}=N_2,\quad \int d\beta_x e^{-\mathrm{i}\frac{M}{2\Delta t}\beta_x^2}\beta_x=0,\quad\int d \beta_x \beta_x^2 e^{-\mathrm{i}\frac{M}{2\Delta t}\beta_x^2}=\sqrt{\frac{-2\pi \mathrm{i}\Delta t}{M}}\frac{-\mathrm{i}\Delta t}{M}
+        \end{split}
+    \end{equation}
+    \begin{align*}
+        N\int d\beta_x\int d\beta_{x'} \exp{[\mathrm{i}\frac{M}{2\Delta t}(\beta_x^2-\beta_x'^2)]} (\frac{\beta_x^2}{2}\partial_{x}^2J_r+\frac{\beta_{x'}^2}{2}\partial_{x_f'}^2J_r)=\frac{\mathrm{i}}{2}(\partial_x^2J_r)\frac{\Delta t}{M}-\frac{i}{2}(\partial_{x'}^2J_r)\frac{\Delta t}{M}
+    \end{align*}
+    \eqref{Gussian} explained that in the $x_m$($\beta_x$) integral, $x_m$ equal to $x_f$. The width of \eqref{Gussian} is $\sqrt{\Delta t}$, and $\beta^2$ term gives a contribution $\mathcal{O}(\Delta t)$. And the normalization coefficients satisfy $N*N_1*N_2=1$.
+    \begin{align*}
+        -2\int_0^t ds J_\Sigma(s)\Sigma_{cl}(s)&=-2\int ds(\Delta_f\eta(t-s))(\Sigma_i u_1(s)+\Sigma_fu_2(s))\\&=-2\left(\Delta_f\Sigma_i\int_0^t d s\eta(t-s)u_1(s)+\Delta_f\Sigma_f\int_0^t ds\eta(t-s)u_2(s)\right)=-(\Delta_f\Sigma_id_1+\Delta_f\Sigma_fd_2)\\
+    \end{align*}
+    where $d_i=2\int_0^t ds\eta(t-s)u_i(s)$ and $e_i=\int_0^t ds \nu(t-s)v_{j\neq i}(s)=\int_0^t ds \nu(s)u_i(s)$.
+    \begin{align*}
+        \int_0^tdsJ_\Delta(s)\Delta_{cl}(s)&=\int ds \Delta_f\nu(t-s)(\Delta_i v_1(s)+\Delta_fv_2(s))\\
+        &=\Delta_i\Delta_f\int_0^tds\nu(s)u_2(s)+\Delta_f^2\int ds\nu(s)u_1(s)=\Delta_i\Delta_fe_2+\Delta_f^2e_1
+    \end{align*}
+   $\tilde{J}_{\Delta}(s)=\int_0^s d s'2\nu(s-s')\Delta_{cl}(s')=2\int_0^s ds'\nu(s-s')(\Delta_iv_1(s')+\Delta_fv_2(s')).$
+   \begin{align*}
+       -\frac{1}{2}\int_0^t d s_1\int_0^t ds_2J_\Sigma(s_1)(G_{12}(s_1.s_2)+G_{21}(s_2,s_1))\tilde{J}_\Delta(s_2)=-\Delta_i\Delta_f c_1-\Delta_f^2 c_2
+       \\=-\Delta_i\Delta_f \int_0^t ds_1\int_0^t d s_2\int_0^{s_2} ds_3\eta(t-s_1)(G_{12}(s_1,s_2)+G_{21}(s_2,s_1))\nu(s_2-s_3)v_1(s_3)\\-\Delta_f^2\int_0^t ds_1\int_0^t d s_2\int_0^{s_2} ds_3\eta(t-s_1)(G_{12}(s_1,s_2)+G_{21}(s_2,s_1))\nu(s_2-s_3)v_2(s_3)
+   \end{align*}
+    $c_i(t)=\int_0^t ds_1\int_0^t d s_2\int_0^{s_2} ds_3\eta(t-s_1)(G_{12}(s_1,s_2)+G_{21}(s_2,s_1))\nu(s_2-s_3)v_i(s_3)$; $c_i$ comes from fluctuation integration of $\chi$, and it is order $\mathcal{O}(\lambda^4)$.
+   \\
+   In the order $\mathcal{O}(\Delta t)$:
+    \begin{align*}
+         J_r(t+\Delta t;x_f,x_f')=N(t)\int_{-\infty}^\infty dx_m\int_{-\infty}^\infty dx_m'\exp{[\mathrm{i}\frac{M}{2\Delta t}(\beta_x^2-\beta_x'^2)]}\cdot\left[1-\mathrm{i}\Delta t V(x_f)-\mathrm{i}\Delta t V(x_f')\right]\\
+         \cdot (J_r(t;x_f,x_f')+\frac{\beta_x^2}{2}\partial_{x}^2J_r+\frac{\beta_{x'}^2}{2}\partial_{x_f'}^2J_r)\cdot \left(1-\mathrm{i}\Delta t(\Delta_f\Sigma_id_1+\Delta_f\Sigma_fd_2)-\Delta_i\Delta_f(e_2+c_1)\Delta t-\Delta_f^2(e_1+c_2)\Delta t\right)
+    \end{align*}
+    \begin{align*}
+        \partial_tJ_r(t)=-\mathrm{i}\left[-\frac{1}{2}(\partial_x^2-\partial_{x'}^2+\Omega^2(x_f^2-x_f'^2))\right]J_r+[\text{Terms with} \Delta_i,\Sigma_f,\Delta_f]J_r
+    \end{align*}
+    
+    \begin{align*}
+        J_r(t+\Delta t;x,x')=&J_r(t;x,x')+\frac{\mathrm{i}}{2}(\partial_x^2J_r)\frac{\Delta t}{M}-\frac{i}{2}(\partial_{x'}^2J_r)\frac{\Delta t}{M}\\
+        &+J_r(t,;x,x')\Delta t\left(-\mathrm{i}V(x)+\mathrm{i}V(x')-\mathbf{i}\Delta_f\Sigma_id_1-\mathrm{i}\Delta_f\Sigma_f d_2-\Delta_i\Delta_f(e_2+c_1)-\Delta_f^2(e_1+c_2)\right)
+    \end{align*}
+    \begin{align}
+        \mathrm{i}\partial_t J_r(t;x,x')=\Big{\{ }-\frac{1}{2M}(\partial_x^2-\partial_{x'}^2)+V(x)-V(x')+\Delta_f\Sigma_i d_1+\Delta_f\Sigma_fd_2-\mathrm{i}\Delta_i\Delta_f(e_2+c_1)-\mathrm{i}\Delta_f^2(e_1+c_2)\Big\}J_r(t;x,x')\label{eq:master1}
+    \end{align}
+% \end{widetext}
+\subsubsection{处理初始条件相关变量$\Sigma_i,\Delta_i$}
+In order to determine the expressions for $\Sigma_i J_r(t)$ and $\Delta_i J_r(t)$, we examine the explicit form of $J_r$.
+$J_r(t,f;i,0)=\mathcal{N}e^{\mathrm{i}A_0[\Sigma_{cl},\Delta_{cl}]}$,$A_0[\Sigma_{cl},\Delta_{cl}]=\int_0^t ds M(\dot{\Sigma}_{cl}\dot{\Delta}_{cl}-\Omega^2\Delta_{cl}\Sigma_{cl})-2\int_0^tds_1\int_0^{s_1}ds_2\Delta_{cl}(s_1)\eta(s_1-s_2)\Sigma_{cl}(s_2)+\frac{1}{2}\mathrm{i}\int_0^tds_1\int_0^{t}ds_2\Delta_{cl}(s_1)\nu(s_1-s_2)\Delta_{cl}(s_2)$. Do partial integral: $A_0[\Sigma_{cl},\Delta_{cl}]=M(\Delta_f\dot{\Sigma}_f-\Delta_i\dot{\Sigma}_i)+\mathrm{i}\operatorname{Im}A_0[\Delta_{cl}]$. We can get an expression of $J_r$ which depends on boundary conditions explicitly.
+% \begin{widetext}
+    \begin{align*}
+    J_r=\mathcal{N}\exp{\mathrm{i}M\left[\Delta_f\Sigma_i\dot{u}_1(t)-\Delta_i\Sigma_i\dot{u}_1(0)-\Delta_i\Sigma_f\dot{u}_2(0)+\Delta_f\Sigma_f\dot{u}_2(t)\right]}\\
+    \cdot \exp{-\frac{1}{2}(\Delta_i^2 a_{11}+\Delta_i\Delta_f(a_{12}+a_{21})+\Delta_f^2 a_{22})}
+\end{align*}
+where $a_{ij}=\int_{0}^tds_1\int_0^t ds_2 v_i(s_1)\nu(s_1-s_2)v_2(s_2)$.
+\begin{align*}
+    \partial_{\Sigma_f}J_r=[-\mathrm{i}\Delta_i\dot{u}_2(0)+\mathrm{i}\Delta_f\dot{u}_2(t)]J_r\\
+    \Delta_iJ_r=(\frac{\dot{u}_2(t)}{\dot{u}_2(0)}\Delta_f+\mathrm{i}\frac{1}{\dot{u}_2(0)}\partial_{\Sigma_f})J_r
+\end{align*}
+\begin{align*}
+    \Sigma_i J_r(t, 0) = \left[ -\frac{\dot{u}_2(t)}{\dot{u}_1(t)} \Sigma_f - i \left( \frac{4a_{22}(t)}{\dot{u}_1(t)} + \frac{2a_{21}(t)}{\dot{u}_1(t)} \frac{\dot{u}_2(t)}{\dot{u}_2(0)} \right) \Delta_f - \frac{i}{\dot{u}_1(t)} \frac{\partial}{\partial \Delta_f} + \frac{2a_{21}(t)}{\dot{u}_1(t) \dot{u}_2(0)} \frac{\partial}{\partial \Sigma_f} \right] J_r(t, 0),
+\end{align*}
+% \end{widetext}
+\subsubsection{将$\Delta_f,\Sigma_f,\partial_{\Delta},\partial_{\Sigma}$替换为$x,x'$}
+Definition：$\Sigma_{f}=\frac{1}{2}(x+x'),\Delta_f=x-x';$ inverse transform $x=\Sigma_f+\frac{1}{2}\Delta_f,x'=\Sigma_f-\frac{1}{2}\Delta_f$; derivative relation $\partial_{\Sigma}=\partial_x+\partial_{x'},\partial_\Delta=\frac{1}{2}(\partial_x-\partial_{x'})$.   We get the replacement rule the:
+\begin{align*}
+    \Delta_f^2J_r(t)=(x-x')^2J_r(t)\\
+    \Delta_f\Sigma_fJ_r(t)=\frac{1}{2}({x^2-x'^2})J_r(t)\\
+    \Delta_f\partial_{\Sigma_f}J_r=(x-x')(\partial_x+\partial_{x'})J_r\\
+    \Delta_f\partial_{\Delta_f}J_r=\frac{1}{2}(x-x')(\partial_x-\partial_{x'})J_r.
+\end{align*}
+% \begin{widetext}
+    \begin{align*}
+        \Delta_f\Delta_iJ_r=\Delta_f(\frac{\dot{u}_2(t)}{\dot{u}_2(0)}\Delta_f+\mathrm{i}\frac{1}{\dot{u}_2(0)}\partial_{\Sigma_f})J_r
+    \end{align*}
+    \begin{align*}
+        \Delta_f\Sigma_iJ_r=\Delta_f\left[ -\frac{\dot{u}_2(t)}{\dot{u}_1(t)} \Sigma_f - i \left( \frac{4a_{22}(t)}{\dot{u}_1(t)} + \frac{2a_{21}(t)}{\dot{u}_1(t)} \frac{\dot{u}_2(t)}{\dot{u}_2(0)} \right) \Delta_f - \frac{i}{\dot{u}_1(t)} \frac{\partial}{\partial \Delta_f} + \frac{2a_{21}(t)}{\dot{u}_1(t) \dot{u}_2(0)} \frac{\partial}{\partial \Sigma_f} \right] J_r(t, 0),
+    \end{align*}
+% \end{widetext}
+In \eqref{eq:master1}, collect the coefficients of $\Delta_f^2J_r(t),$\ $\Delta_f\Sigma_fJ_r(t),$$\Delta_f\partial_{\Sigma_f}J_r,$$\Delta_f\partial_{\Delta_f}J_r.$
+% \begin{widetext}
+    \begin{align*}
+    \Delta_f\partial_{\Delta_f}J_r\cdot\left(-\mathrm{i}\frac{d_1}{\dot{u}_1(t)}\right)=-\mathrm{i}\underbrace{[\frac{1}{2}\frac{d_1}{\dot{u}_1(t)}]}_{\Gamma(t)}(x-x')(\partial_x-\partial_{x'})J_r
+    \end{align*}
+    \begin{align*}
+        \Delta_f\Sigma_f J_r\cdot\left(d_2-\frac{d_1\dot{u}_2(t)}{\dot{u}_1(t)}\right)=\frac{1}{2}\underbrace{[d_2-2\Gamma(t)\dot{u}_2(t)]}_{\delta\Omega^2}(x^2-x'^2)J_r
+    \end{align*}
+    \begin{align*}
+        \Delta_f\partial_{\Sigma_f}J_r\cdot\left(\frac{e_2+c_1}{\dot{u}_2(0)}+d_1\frac{2a_{21}(t)}{\dot{u}_1(t)\dot{u}_2(0)}\right)=2\Gamma(t)\underbrace{\left(\frac{e_2+c_1}{2\Gamma(t)\dot{u}_2(0)}+\frac{2a_{21}(t)}{\dot{u}_2(0)}\right)}_{f(t)}(x-x')(\partial_x+\partial_{x'})J_r
+    \end{align*}
+    \begin{align*}
+        \Delta_f^2 J_r\cdot\mathrm{i}\left(-(e_1+c_2)-(e_2+c_1)\frac{\dot{u}_2(t)}{\dot{u}_2(0)}-d_1\left( \frac{4a_{22}(t)}{\dot{u}_1(t)} + \frac{2a_{21}(t)}{\dot{u}_1(t)} \frac{\dot{u}_2(t)}{\dot{u}_2(0)} \right)\right)\\
+        =-\mathrm{i}\left((e_1+c_2)+\frac{4a_{22}(t)d_1}{\dot{u}_1(t)}+\dot{u}_2(t)(\frac{e_2+c_1}{\dot{u}_2(0)}+d_1\frac{2a_{21}(t)}{\dot{u}_1(t)\dot{u}_2(0)})\right)(x-x')^2J_r\\
+        =-\mathrm{i}\Gamma(t)\underbrace{\left(\frac{e_1+c_2}{\Gamma(t)}+8a_{22}(t)+2\dot{u}_2(t)f(t)\right)}_{h(t)}(x-x')^2J_r
+    \end{align*}
+% \end{widetext}
+\subsubsection{主方程具体形式}
+By multiplying $\rho_r(x_i,x_i';0)$ with the reduced propagator $J_r$, we obtain the master equation in the coordinate representation.
+% \begin{widetext}
+    \begin{equation}
+        \begin{split}
+             \mathrm{i}\partial_t&\rho_r(x,x',t)=-[\frac{1}{2M}(\partial_x^2-\partial_{x'}^2)+\frac{1}{2}M\Omega^2(x^2-x'^2)]\rho_r(x,x',t)+\frac{1}{2}\delta\Omega^2(x^2-x'^2)\rho_r(x,x',t)\\&
+             -\mathrm{i}\Gamma(t)(x-x')(\partial_x-\partial_{x'})\rho_r(x,x',t)
+        +2\Gamma(t)f(t)(x-x')(\partial_x+\partial_{x'})\rho_r(x,x',t)-\mathrm{i}\Gamma(t)h(t)(x-x')^2\rho_r(x,x',t)
+        \end{split}
+    \end{equation}
+In operator form:
+    \begin{equation}
+        \mathrm{i}\hbar\partial_t\hat{\rho}=[H_0+\delta H,\hat{\rho}]+\Gamma(t)[\hat{x},\{\hat{p},\hat{\rho}\}]-\mathrm{i}\Gamma(t)h(t)[\hat{x},[\hat{x},\hat{\rho}]]-\mathrm{i}2\Gamma(t)f(t)[\hat{x},[\hat{p},\hat{\rho}]]\label{eq:master3}
+    \end{equation}
+% \end{widetext}
+We can see how obseverble moment evolution: $\frac{d }{d t}\braket{A}=\operatorname{Tr}(A\partial_t\rho)$, which lead to:
+$$\frac{d}{dt}\braket{p}=-2\Gamma(t)\braket{p}-M \Omega_r^2\braket{x}$$
+$$\frac{d}{dt}\braket{p^2}=2\Gamma(t)h(t)\hbar+\cdots$$
+% \begin{widetext}
+$H_0+\delta H_0=\frac{1}{2M}p^2+\frac{1}{2}\Omega_r^2x^2$, $\frac{1}{\mathrm{i}\hbar}Tr(p,[H,\rho])=-M\Omega_c^2\braket{x}$.
+    \begin{align*}
+        \frac{1}{\mathrm{i}\hbar}\operatorname{Tr}(A[x,\{p,\rho\}])= \frac{1}{\mathrm{i}\hbar}\operatorname{Tr}([A,x]\cdot\{p,\rho\}),\\
+          \text{when }A=\hat{p},\quad\Gamma(t)\frac{1}{\mathrm{i}\hbar}\operatorname{Tr}(p[x,\{p,\rho\}])=-2\braket{p}\Gamma(t)
+    \end{align*}
+    So the second term in \eqref{eq:master3} is dissipation term. Which decrease the momentum of system.
+    \begin{align*}
+        \frac{1}{\mathrm{i}\hbar}\operatorname{Tr}(A[x,[x,\rho]])= \frac{1}{\mathrm{i}\hbar}\operatorname{Tr}([A,x]\cdot[x,\rho])\\
+        \text{when }A=\hat{p}^2,\quad \frac{1}{\mathrm{i}\hbar}\operatorname{Tr}(p^2[x,[x,\rho]])=\frac{1}{\mathrm{i}\hbar}\operatorname{Tr}([p^2,x][x,\rho])\\
+        =\frac{1}{\mathrm{i}\hbar}\operatorname{Tr}(-2 \mathrm{i}\hbar p[x,\rho])=\frac{1}{\mathrm{i}\hbar}\operatorname{Tr}(-2 \mathrm{i}\hbar [p,x]\rho)=2\mathrm{i}\hbar
+    \end{align*}
+    这一项使得动量的二阶矩逐渐扩散。故为Diffuse term.
+    \begin{align*}
+        \frac{1}{\mathrm{i}\hbar}\operatorname{Tr}(A[x,[p,\rho]])= \frac{1}{\mathrm{i}\hbar}\operatorname{Tr}([A,x]\cdot[p,\rho])\\
+        \text{when }A=\hat{p}^2,\quad \frac{1}{\mathrm{i}\hbar}\operatorname{Tr}(p^2[x,[p,\rho]])=\frac{1}{\mathrm{i}\hbar}\operatorname{Tr}([p^2,x][p,\rho])\\
+        =\frac{1}{\mathrm{i}\hbar}\operatorname{Tr}(-2 \mathrm{i}\hbar p[p,\rho])=\frac{1}{\mathrm{i}\hbar}\operatorname{Tr}(-2 \mathrm{i}\hbar [p,p]\rho)=0
+    \end{align*}
+    
+% \end{widetext}
+利用主方程计算纯度的变化$\frac{d}{dt}\braket{\rho^2}=2\braket{\rho\partial_t\rho}$
+% \begin{widetext}
+    \begin{align*}
+        \frac{d}{dt}\braket{\rho^2}=2\braket{\rho\partial_t\rho}=2\frac{1}{\mathrm{i}\hbar}\braket{\rho\left([H,\hat{\rho}]+\Gamma(t)[\hat{x},\{\hat{p},\hat{\rho}\}]-\mathrm{i}\Gamma(t)h(t)[\hat{x},[\hat{x},\hat{\rho}]]-\mathrm{i}2\Gamma(t)f(t)[\hat{x},[\hat{p},\hat{\rho}]]\right)}\\
+        =2\Gamma(t)\operatorname{Tr}\rho^2-2\Gamma(t)h(t)\frac{1}{\hbar}\operatorname{Tr}([\rho,x]\cdot[x,\rho])-\frac{4\Gamma(t)f(t)}{\hbar}\operatorname{Tr}(px\rho^2-xp\rho^2-2\rho x\rho p).
+    \end{align*}
+\subsubsection{Diffuse coefficient}
+Define:
+\begin{equation}
+    D(t)=\Gamma(t)h(t)=\left((e_1+c_2)+\frac{4a_{22}(t)d_1}{\dot{u}_1(t)}-\dot{u}_2(t)(\frac{e_2+c_1}{\dot{u}_2(0)}+d_1\frac{2a_{21}(t)}{\dot{u}_1(t)\dot{u}_2(0)})\right)
+\end{equation}
+$$e_1=\int_0^t ds\nu(t-s)v_2(s),e_2=\int ds\nu(t-s)v_1(s).$$
+Extract the term 
+$$D_{main}(t)=\int_0^tds\nu(t-s)\left(v_2(s)+\frac{\dot{u}_2(t)}{\dot{u}_2(0)}v_1(s)\right).$$
+% \end{widetext}
+\section{Influence functionals in scalar field models}
+The main difference is that the interaction is no longer linear, but instead takes the quartic form $\phi^4$. 
+This leads to several types of terms, such as 
+$\phi_S^4$, $\phi_S^3\phi_F$, $\phi_S^2\phi_F^2$, $\phi_S\phi_F^3$, and $\phi_F^4$. 
+We can analyze these contributions term by term. 
+\subsection{$\phi_S^3\phi_F$ term}
+Among them, the term $\phi_S^3\phi_F$ is the most similar to the oscillator case we previously discussed. 
+If we simplify the slow sector to a single mode, we denote it by
+\[
+x=\sqrt{\frac{\hbar}{2m\omega_S}}\,(a+a^\dagger).
+\]
+We then consider its interaction with the fast modes
+\[
+Q=\sum_{i,\omega_i>b\Lambda}\sqrt{\frac{\hbar}{2m\omega_i}}\,(b_i+b_i^\dagger),
+\]
+through a coupling of the form $\lambda x^3 Q .$ When we consider this kind of interaction, I want to see the difference in master equation between the linear case. 
+
+The correlation function of $Q$ is same with \eqref{eq:correlation function}.
+
+The influence functional is almost same with \eqref{eq:influence functional}.
+    \begin{equation}
+        \begin{split}
+             \delta A[x,x']
+        =\mathrm{i}\int_0^t ds_1\int_0^{s_1}ds_2\Delta_3(s_1)\nu(s_1-s_2)\Delta_3(s_2)-2\int_0^t ds_1\int_0^{s_1}ds_2\Delta_3(s_1)\eta(s_1-s
+        _2)\Sigma_3(s_2)\\
+        \text{where}\quad \Delta_3(s)=x^3(s)-x'^3(s),\Sigma_3(s)=\frac{x^3(s)+x'^3(s)}{2}.\label{eq:influence functional x^3q}
+        \end{split}
+    \end{equation}
+The calculation is still same in reduced propagator \eqref{eq:reduced propagator 0}, except change the coordinate $\Sigma,\Delta$ to $\Sigma_3,\Delta_3$.
+% \begin{widetext}
+    \begin{equation}
+        \begin{split}
+             J_r(t+\Delta t;x_f,x_f')=N(t)\int_{0}^\infty dx_m\int_{0}^\infty dx_m'\exp{[\mathrm{i}\frac{M}{2\Delta t}((x_f-x_m)^2-(x_f'-x_m')^2)]}\cdot\left[1-\mathrm{i}\Delta t V(x_f)-\mathrm{i}\Delta t V(x_f')\right]\\\cdot \int_i^m \mathcal{D}\bar{x}\mathcal{D}\bar{x}' \exp{[\mathrm{i}\left(
+        S[\bar{x}]-S[\bar{x}']-2\int_0^{t} ds_1\int_0^{s_1}ds_2\bar{\Delta}_3(s_1)\eta(s_1-s_2)\bar{\Sigma}_3(s_2)+\mathrm{i}\int_0^{t} ds_1\int_0^{s_1}ds_2\bar{\Delta}_3(s_1)\nu(s_1-s_2)\bar{\Delta}_3(s_2)
+        \right)]}\\
+        \cdot\exp{\mathrm{i}\Delta t\left[-2\int_0^t ds\bar{\Sigma}_3(s)J_{\Sigma_3}(s)+\mathrm{i}\int_0^{t}ds\bar{\Delta}_3(s)J_{\Delta_3}(s)\right]}\\
+        \text{where}\quad J_{\Sigma_3}(s)=\frac{1}{\Delta t}\int_t^{t+\Delta t} ds_1\tilde{\Delta}_3(s_1)\eta(s_1-s),J_{\Delta_3}(s)=\frac{1}{\Delta t}\int_t^{t+\Delta t} ds_1\tilde{\Delta}_3(s_1)\nu(s_1-s).\label{eq:reduced propagator 3}
+        \end{split}
+    \end{equation}
+% \end{widetext}
+Approximate with first-order accuracy in \(\Delta t\)， $J_{\Sigma_3}(s)\approx\Delta_{3,f}\eta(t-s),J_{\Delta_3}\approx\Delta_{3,f}\nu(t-s)$.
+
+Although $\Delta_3$ and $\Sigma_3$ appear in $\delta A$, the main part $S[x]-S[x']$ is still expressed in terms of $\Delta$ and $\Sigma$.
+\subsubsection{鞍点}
+In \eqref{eq:reduced propagator 0}, we can express the $\Delta_3/\Sigma_3$ terms to some functional of $\Delta$ and $\Sigma$. When evaluated the saddle equation of $\Delta_{cl}/\Sigma_{cl}$, we use follow formulas.
+\begin{equation}
+    \begin{split}
+        \text{Assume } I(\Delta,\Sigma)=-2\int_0^t ds_1\int_0^{s_1} ds_2 f(\Delta(s_1),\Sigma(s_1))\eta(s_1-s_2)g(\Delta(s_2),\Sigma(s_2)),\\
+        \frac{\delta I}{\delta \Delta(s)} = -2 \left[ (\partial_{\Delta} f)(s) \int_0^s ds' \, \eta(s-s') g(s') + (\partial_{\Delta} g)(s) \int_s^t ds' f(s') \eta(s'-s) \right],\\
+        \frac{\delta I}{\delta \Sigma(s)} = -2 \left[ (\partial_{\Sigma} f)(s) \int_0^s ds' \, \eta(s-s') g(s') + (\partial_{\Sigma} g)(s) \int_s^t ds' f(s') \eta(s'-s) \right].
+    \end{split}\label{eq: variation over function}
+\end{equation}
+\begin{equation}
+    \begin{split}
+        \Delta_3=x^3-x'^3=(\Sigma+\frac{\Delta}{2})^3-(\Sigma-\frac{\Delta}{2})^3=3\Sigma^2\Delta+\frac{\Delta^3}{4},\\
+        \Sigma_3=\frac{1}{2}((\Sigma+\frac{\Delta}{2})^3+(\Sigma-\frac{\Delta}{2})^3)=\Sigma^3+\frac{3}{4}\Sigma\Delta^2;\\
+        \partial_\Delta \Delta_3=3\Sigma^2+\frac{3}{4}\Delta^2,\partial_\Sigma\Delta_3=6\Sigma\Delta;\\
+        \partial_\Delta\Sigma_3=\frac{3}{2}\Sigma\Delta,\partial_\Sigma\Sigma_3=3\Sigma^2+\frac{3}{4}\Delta^2.
+    \end{split}
+\end{equation}
+The saddle equation change to:
+\begin{align}
+    \ddot{\Sigma}_{\mathrm{cl}}(s)+ \Omega^2 \Sigma_{\mathrm{cl}}(s)+ 2 \left[ (\partial_{\Delta} \Delta_{3,cl})(s) \int_0^s ds' \, \eta(s-s') \Sigma_{3,cl}(s') + (\partial_{\Delta} \Sigma_{3,cl})(s) \int_s^t ds' \Delta_{3,cl}(s') \eta(s'-s) \right]=0,\label{eq:saddle3}\\
+    \ddot{\Delta}_{\mathrm{cl}}(s)+ \Omega^2 \Delta_{\mathrm{cl}}(s)+ 2 \ \left[ (\partial_{\Sigma} \Delta_{3,cl})(s) \int_0^s ds' \, \eta(s-s') \Sigma_{3,cl}(s') + (\partial_{\Sigma} \Sigma_{3,cl})(s) \int_s^t ds' \Delta_{3,cl}(s') \Delta_{3,cl}(s'-s) \right]= 0,\label{eq:saddle4}
+\end{align}
+If we expand coordinates around saddle points $\Sigma=\Sigma_{cl}+\chi_1,\Delta=\Delta_{cl}+\chi_2$, the collective coordinates have expression :$\Delta_3=\Delta_{3,cl}+\frac{\partial\Delta_3}{\partial \Sigma}|_{cl}\chi_1+\frac{\partial\Delta_3}{\partial \Delta}|_{cl}\chi_2+\cdots; \Sigma_3=\Sigma_{3,cl}+\frac{\partial\Sigma_3}{\partial \Sigma}|_{cl}\chi_1+\frac{\partial\Sigma_3}{\partial \Delta}|_{cl}\chi_2+\cdots.$ Similar to \eqref{eq:reduced propagator after saddle}  the reduced propagator become:
+\begin{equation}
+    \begin{split}
+        A_0[\chi_1,\chi_2]=A_0[\Delta_{cl},\Sigma_{cl}]-2\int_0^t ds_1\int_0^{s_1}ds_2(\Delta_{3,cl}+\partial_\Sigma\Delta_3\chi_1+\partial_\Delta\Delta_3\chi_2)_{s_1}\eta(s_1-s_2)(\Sigma_{3,cl}+\partial_\Sigma\Sigma_3\chi_1+\partial_\Delta\Sigma_3\chi_2)_{s_2}\\
+        +\I \int_0^t ds_1\int_0^{s_1}ds_2(\Delta_{3,cl}+\partial_\Sigma\Delta_3\chi_1+\partial_\Delta\Delta_3\chi_2)_{s_1}\nu(s_1-s_2)(\Delta_{3,cl}+\partial_\Sigma\Delta_3\chi_1+\partial_\Delta\Delta_3\chi_2)_{s_2}\\
+        \delta A[\chi_1,\chi_2]=\delta A[\Delta_{cl},\Sigma_{cl}]+\Delta t\left\{-2\int_0^t ds(\partial_\Sigma\Sigma_3(s)\chi_1(s)+\partial_\Delta\Sigma_3(s)\chi_2(s))J_{\Sigma_3}+\I\int_0^t ds(\partial_\Sigma\Delta_3(s)\chi_1(s)+\partial_\Delta\Delta_3(s)\chi_2(s))J_{\Delta_3}\right\}
+    \end{split}
+\end{equation}
+\begin{equation}
+    \begin{split}
+        J_r[m;i;J_{\Sigma,\Delta}]=\exp{\mathrm{i}(A_0[\Sigma_{cl},\Delta_{cl}]+\delta A[\Sigma_{cl},\Delta_{cl}])}\underbrace{\int_0^0\mathcal{D}\chi_1\int_0^0\mathcal{D}\chi_2\text{quadratic form of} \chi}_{J_r[0,0,t|0,0;\text{source}]}\label{eq:reduced propagator after saddle 1}
+    \end{split}
+\end{equation}
+    \begin{align*}
+J_r[0,0,t|0,0;\text{source}]=\int_0^0\mathcal{D}\chi_1\int_0^0\mathcal{D}\chi_2\exp{\mathrm{i}\left[\int_0^t ds_1\int_0^tds_2\frac{1}{2}\chi_i(s_1)\mathcal{O}_{ij}(s_1,s_2)\chi_i(s_2)+\int_0^t ds \chi_iB_i\right]}
+\end{align*}
+\begin{equation}
+    \begin{split}
+        O_{11}(s_1,s_2)=2i\,\nu(s_1,s_2)\partial_\Sigma \Delta_3(s_1)\partial_\Sigma \Delta_3(s_2)-4\eta(s_1,s_2)\partial_\Sigma \Delta_3(s_1)\partial_\Sigma \Sigma_3(s_1)\theta(s_1-s_2),
+    \end{split}
+\end{equation}
+\[
+ O_{22}(s_1,s_2)=2i\,\nu(s_1,s_2)\partial_\Delta \Delta_3(s_1)\partial_\Delta \Delta_3(s_2)-4\eta(s_1,s_2)\partial_\Delta \Delta_3(s_1)\partial_\Delta \Sigma_3(s_1)\theta(s_1-s_2),
+\]
+
+\[
+O_{12}(s_1,s_2)=\left[
+\frac{d^2}{ds_1^2}+\Omega^2\right]\delta(s_1-s_2)+2\theta(s_2-s_1)\,\eta(s_2-s_1)\partial_\Delta\Delta_3(s_1)\partial_\Sigma\Sigma_3(s_2)+2\theta(s_1-s_2)\,\eta(s_1-s_2)\partial_\Sigma \Delta_3(s_1)\partial_\Delta\Sigma_3(s_2),
+\]
+
+\[
+O_{21}(s_1,s_2)=\left[\frac{d^2}{ds_1^2}+\Omega^2\right]\delta(s_1-s_2)+2\theta(s_1-s_2)\,\eta(s_1-s_2)\partial_\Delta\Delta_3(s_1)\partial_\Sigma\Sigma_3(s_2)+2\theta(s_2-s_1)\,\eta(s_2-s_1)\partial_\Sigma \Delta_3(s_1)\partial_\Delta\Sigma_3(s_2).
+\]
+\[B_1(s)=-2\Delta t J_\Sigma(s)\partial_\Sigma\Sigma_3+\I\Delta t J_{\Delta_3}\partial_{\Sigma}\Delta_3 +\I\tilde{J}_{\Delta_3}\partial_\Sigma\Delta_3,\]
+\[B_2(s)=-2\Delta t J_\Sigma(s)\partial_\Delta\Sigma_3+\I\Delta t J_{\Delta_3}(s)\partial_{\Delta}\Delta_3 +\I\tilde{J}_{\Delta_3}\partial_\Delta\Delta_3.\]
+\begin{align}
+    J_r[0,0,t|0,0;\boldsymbol{B}]=\mathcal{N}\exp{-\mathrm{i}\frac{1}{2}\int_0^t ds\int_0^t ds'B_i(s)G_{ij}(s,s')B_j(s')}
+\end{align}
+{\small  \begin{align*}
+    &J_r[m;i;J_{\Sigma,\Delta}]=\underbrace{\mathcal{N}\exp{\mathrm{i}(A_0[\Sigma_{cl},\Delta_{cl}])}}_{\approx J_{r}[x_m,x_m',t;x_i,x_i']}
+    \\&\cdot \exp{\mathrm{i}\Delta t\left[-2\int_0^t ds{\Sigma}_{3cl}(s)J_{\Sigma_3}(s)+\mathrm{i}\int_0^{t}ds{\Delta}_{3cl}(s)J_{\Delta_3}(s)\right]-\mathrm{i}\frac{1}{2}\int_0^t ds\int_0^t ds'\underbrace{B_i(s)G_{ij}(s,s')B_j(s')}_{\text{just keep in } \Delta t\text{ order.}}}
+\end{align*}}
+Compare to \eqref{eq:reduced propagator after saddle}, this case is more complicate because of the mix due to the dependence of $\Sigma/\Delta$ in $\Sigma_3$ and $\Delta_3$. 
+The procedure used to derive the correct master equation in the linear case is much harder to implement in the case of cubic interactions.
+\begin{equation}
+    \begin{split}
+         &J_r(t+\Delta t;x,x')=J_r(t;x,x')+\frac{\mathrm{i}}{2}(\partial_x^2J_r)\frac{\Delta t}{M}-\frac{i}{2}(\partial_{x'}^2J_r)\frac{\Delta t}{M}+J_r(t,;x,x')\Delta t\cdot\\
+        &\left(-\mathrm{i}V(x)+\mathrm{i}V(x')+\I \left[-2\int_0^t ds{\Sigma}_{3cl}(s)J_{\Sigma_3}(s)+\mathrm{i}\int_0^{t}ds{\Delta}_{3cl}(s)J_{\Delta_3}(s)-\frac{1}{2}\int_0^t ds\int_0^t ds'\underbrace{B_i(s)G_{ij}(s,s')B_j(s')}_{\text{just keep in } \Delta t\text{ order.}}\right]\right)\label{eq:master x^3q 1}
+    \end{split}
+\end{equation}
+\subsubsection{处理初始条件相关变量$\Sigma_i,\Delta_i$}
+This step need to evaluate $J_r(t,f;i,0)$. In our saddle point choice, the expression is:
+\begin{equation}
+    J_r(t,f;i,0)=\mathcal{N}\exp{\I M(\Delta_f\dot{\Sigma}_f-\Delta_i\dot{\Sigma}_i)-\frac{1}{2}\int\D s_1\int\D s_2\Delta_{3,cl}(s_1)\nu(s_1-s_2)\Delta_{3,cl}(s_2)}
+\end{equation}
+$\Sigma_{cl}=\Sigma_i u_1(s)+\Sigma_f u_2(s);\Delta_{cl}=\Delta_i v_1(s)+\Delta_f v_2(s)$.
+\begin{equation}
+    \begin{split}
+        \Delta_{3,cl}(s_1) = 3\Sigma_i^2 \Delta_i u_1^2 v_1 + 3\Sigma_i^2 \Delta_f u_1^2 v_2
++3\Sigma_f^2 \Delta_i u_2^2 v_1 \\+ 3\Sigma_f^2 \Delta_f u_2^2 v_2
++6\Sigma_i \Sigma_f \Delta_i u_1 u_2 v_1 + 6\Sigma_i \Sigma_f \Delta_f u_1 u_2 v_2\\
++ \frac{\Delta_i^3}{4} v_1^3 + \frac{3}{4} \Delta_i^2 \Delta_f v_1^2 v_2 + \frac{3}{4} \Delta_i \Delta_f^2 v_1 v_2^2 + \frac{\Delta_f^3}{4} v_2^3
+    \end{split}
+\end{equation}
+$\Delta_{3,cl}(t)=3\Sigma_f^2\Delta_f+\frac{\Delta_f^3}{4}\equiv \Delta_{3,f}$; and similar formula would apply to $\Delta_{3,cl}(s)$. 
+In the exponential, there are total $(4\times 4\times4)^2$ term related to $\Sigma_i,\Sigma_f,\Delta_i,\Delta_f$. I can just write the term related to the main part.
+\begin{equation}
+    \begin{cases}
+        \Delta_iJ_r=\left[\frac{\dot{u}_2(t)}{\dot{u}_2(0)}\Delta_f+\mathrm{i}\frac{1}{\dot{u}_2(0)}\partial_{\Sigma_f}+(\text{tedious terms with integral of kernel }\nu)\right]J_r\\
+         \Sigma_i J_r(t, 0) = \left[ -\frac{\dot{u}_2(t)}{\dot{u}_1(t)} \Sigma_f-\I\frac{1}{\dot{u}_1(t)}\frac{\partial}{\partial\Delta_f} +(\text{tedious terms with integral of kernel }\nu)\right]J_r(t,0)
+    \end{cases}
+\end{equation}
+In the following calculation, we treat $\Delta_i$ as $\frac{\dot{u}_2(t)}{\dot{u}_2(0)}\Delta_f$, and ignore the corresponding contribution due to its complexity \footnote{These term are order $\lambda^2$}.
+\subsubsection{term related to diffuse}
+I just pick up term $\Delta_{3,f}^2J_r\sim (x^3-x'^3)^2J_r\sim[\hat{x}^3,[\hat{x}^3,\hat{\rho}]]$, because I know this term would produce diffuse and decoherence. 
+
+The term $-[\int_0^t \D s \Delta_{3cl}(s)J_{\Delta_3}(s)]J_r$ in \eqref{eq:master x^3q 1} would give a contribution, which similar to the $e_i$ term in \eqref{eq:master3}. \footnote{Because I didn't treat the term related to $G_{ij}$, so there is no term related to $c_i$ occur in master equation, which actually did.} 
+$$\textcolor{red}{(-)}[\int_0^t \D s \Delta_{3,cl}(s)\nu(t-s)]\Delta_{3,f}J_r$$
+\begin{equation}
+    \Delta_{3cl}(s)=3\Sigma_f^2\Delta_f\left(u_2(s)-\frac{\dot{u}_2(t)}{\dot{u_1}(t)}u_1(s)\right)^2\left(\frac{\dot{u}_2(t)}{\dot{u}_2(0)}v_1(s)+v_2(s)\right)+\frac{\Delta_f^3}{4}\left(\frac{\dot{u}_2(t)}{\dot{u}_2(0)}v_1(s)+v_2(s)\right)^3
+\end{equation}
+\begin{equation}
+    \begin{split}
+        \Delta_{3cl}(s)=&\Delta_{3,f}\left(u_2(s)-\frac{\dot{u}_2(t)}{\dot{u_1}(t)}u_1(s)\right)^2\left(\frac{\dot{u}_2(t)}{\dot{u}_2(0)}v_1(s)+v_2(s)\right)\\
+        &+\frac{\Delta_f^3}{4}\left(\frac{\dot{u}_2(t)}{\dot{u}_2(0)}v_1(s)+v_2(s)\right)\left[\left(\frac{\dot{u}_2(t)}{\dot{u}_2(0)}v_1(s)+v_2(s)\right)^2-\left(u_2(s)-\frac{\dot{u}_2(t)}{\dot{u_1}(t)}u_1(s)\right)^2\right]
+    \end{split}
+\end{equation}
+Define some coefficients:
+\begin{equation}
+    \begin{split}
+        D_1(t)&=\int_0^t\left(u_2(s)-\frac{\dot{u}_2(t)}{\dot{u_1}(t)}u_1(s)\right)^2\left(\frac{\dot{u}_2(t)}{\dot{u}_2(0)}v_1(s)+v_2(s)\right)\nu(t-s)\D s\\
+        D_2(t)&=\frac{1}{4}\int_0^t \left(\frac{\dot{u}_2(t)}{\dot{u}_2(0)}v_1(s)+v_2(s)\right)\left[\left(\frac{\dot{u}_2(t)}{\dot{u}_2(0)}v_1(s)+v_2(s)\right)^2-\left(u_2(s)-\frac{\dot{u}_2(t)}{\dot{u_1}(t)}u_1(s)\right)^2\right]\nu(t-s)\D s\label{coefficients in x^3q}
+    \end{split}
+\end{equation}
+$D_1$ correspond to term $\Delta_{3,f}^2J_r$,and $D_2$ correspond to term $\Delta_f^3\Delta_{3,f}J_r$.
+Multiply with $\rho_r(x_i,x_i';0)$, we could get part of master equation:
+\begin{equation}
+    \begin{split}
+        \partial_r\rho_r(x,x';t)=\frac{\I}{2M}(\partial_x^2-\partial_{x'}^2)\rho_r(t)-\I(V(x)-V(x'))\rho_r(t)-D_1(t)(x^3-x'^3)^2\rho_r(x,x';t)-D_2(t)(x-x')^3(x^3-x'^3)\rho_r(x,x';t)+\cdots
+    \end{split}
+\end{equation}
+In operator form:
+\begin{equation}
+    \partial_t \hat{\rho}(t)=-\I[H,\hat{\rho}]-D_1(t)[\hat{x}^3,[\hat{x}^3,\hat{\rho}]]-D_2(t)[\hat{x},[\hat{x},[\hat{x},[\hat{x}^3,\hat{\rho}]]]]+\cdots\label{eq:master equation for x^3q}
+\end{equation}
+\subsection{$\phi_S\phi_F^3$ term}
+Assume the interaction is $H_I=\sum_n \lambda x q_n^3$. The main difference in this case is the correlation function(spectrum density) of bath degree of freedom.  
+
+Define $Q_3=\lambda\sum_n q_n^3$， the influence functional can be calculate as follow:
+ \begin{equation}
+        \begin{split}
+             \delta A[x,x']=\int_0^t ds  [x(s)\braket{Q_3(s)}-x'(s)\braket{Q_3'(s)}]+\frac{\mathrm{i}}{2}\int ds\int ds' x(s)\braket{\mathcal{T}Q_3(s)Q_3(s')}x(s')+x'(s)\braket{\bar{\mathcal{T}}Q_3(s)Q_3(s')}x'(s')\\
+        -x(s)\braket{Q_3(s')Q_3(s)}x'(s')-x(s')\braket{Q_3(s)Q_3(s')}x'(s)+\cdots\label{eq:influence functional in xq^3}
+        \end{split}
+    \end{equation}
+    \begin{equation}
+        \begin{split}    \braket{Q_3(s)Q_3(s')}=\lambda^2\sum_n\left(6\braket{q_n(s)q_n(s')}^3+9\braket{q_n(s)q_n(s')}\braket{q_n^2}^2\right)\\
+        =\lambda^2\sum_n\left(6\nu^3_n(s-s')-6\nu_n(s-s')\eta^2(s-s')+9\braket{q_n^2}^2\nu_n(s-s')\right)\\
+        +\I\lambda^2\sum_n\left(6\nu_n^2(s-s')\eta_n(s-s')-9\eta_n^3(s-s')+9\braket{q_n^2}^2\eta_n(s-s')\right)\\
+        =\nu_3(s-s')+\I\eta_3(s-s')
+        \end{split}
+    \end{equation}
+    The influence functional is almost same with \eqref{eq:influence functional}.
+    \begin{equation}
+        \begin{split}
+             \delta A[x,x']
+        =\mathrm{i}\int_0^t ds_1\int_0^{s_1}ds_2\Delta(s_1)\nu_3(s_1-s_2)\Delta(s_2)-2\int_0^t ds_1\int_0^{s_1}ds_2\Delta(s_1)\eta_3(s_1-s
+        _2)\Sigma(s_2)\label{eq:influence functional xQ3}
+        \end{split}
+    \end{equation}
+The noise kernel $\nu_3$ is even and the dissipation kernel $\eta_3$ is odd, just as in the case of $\nu$ and $\eta$. Therefore, the calculation proceeds in the same way as in the linear interaction case, except that $\nu$ and $\eta$ are replaced by $\nu_3$ and $\eta_3$.
+\subsection{推广到场}
+To begin with, the action of scalar fields we study is below\footnote{the time integral range is 0 to $t$, because we consider time evolution} \footnote{Represent three-dimensional vectors using bold letters}:
+\begin{equation}
+\begin{split}
+     S[\phi_{S/F}]=\int \D^4x \left[\frac{1}{2}\partial_\mu\phi_{S/F}(x)\partial^\mu\phi_{S/F}(x)-\frac{1}{2}m^2\phi_{S/F}^2(x)\right]\\
+     \phi_S(x)=\int_{|\vec{k}|<b\Lambda}\frac{\D^3\boldsymbol{k}}{(2\pi)^3}\phi(\vec{k},t)e^{\I \boldsymbol{x}\cdot\boldsymbol{k}},
+     \phi_F(x)=\int_{b\Lambda<|\vec{k}|<\Lambda}\frac{\D^3\boldsymbol{k}}{(2\pi)^3}\phi(\vec{k},t)e^{\I \boldsymbol{x}\cdot\boldsymbol{k}};\\
+     S_{int}=-\int\D^4x\left\{\frac{\lambda}{4!}(\phi_S^4+\phi_F^4)+\frac{\lambda}{4}\phi_S^2\phi_F^2+\frac{\lambda}{6}\phi_S^3\phi_F+\frac{\lambda}{6}\phi_S\phi_F^3\right\}.
+\end{split}
+\end{equation}
+First we have figured out the infulence fuctional, and I use $\phi$ to express $\phi_S$. Use $J(\phi)O(\phi_F)$ to describe the interaction action. There exist 3 kinds of interaction $J_1(\phi)O_3(\phi_F)=\frac{1}{6}\lambda\phi\phi_F^3$ and so on. 
+\begin{equation}
+    \begin{split} \rho_r(\phi_f(\boldsymbol{x}),\phi_f'(\boldsymbol{x}),t)=\int\mathcal{D}\phi_i()\mathcal{D}\phi_i'() J_r[\phi_f(\boldsymbol{x}),\phi_f'(\boldsymbol{x}),t;\phi_i,\phi_i',0]\rho_r(\phi_i(\boldsymbol{x}),\phi_i'(\boldsymbol{x}),0),\\
+    J_r[\phi_f(\boldsymbol{x}),\phi_f'(\boldsymbol{x}),t;\phi_i,\phi_i',0]=\int_{0,\phi_i(\boldsymbol{x})}^{t,\phi_f(\boldsymbol{x})}\mathcal{D}\phi(x)\mathcal{D}\phi'(x) e^{\I S[\phi]-\I S[\phi']}e^{\I\delta A[\phi(t),\phi'(t)]}
+    \end{split}
+\end{equation}
+$e^{\I\delta A}=\braket{e^{\I(S_{int}(\phi_;\phi_F)-S_{int}(\phi',\phi_F'))}}_{\phi_F,\phi_F'}$,
+\begin{equation}
+\begin{split}
+     \delta A[\phi(x),\phi(s')]&=-\int\D^4 x (J[\phi(x)]-J[\phi'(x)])\braket{O(x)}\\&+\frac{\I}{2}\int \D^4x_1\int\D^4 x_2 J(x_1)\braket{\mathcal{T}O(x_1)O(x_2)}J(x_2)+J'(x_1)\braket{\bar{\mathcal{T}}O(x_1)O(x_2)})J'(x_2)
+    -J(x_1)\braket{O(x_1)O(x_2)}J'(x_2)\\&-J'(x_1)\braket{O(x_1)O(x_2)}J(x_2)-J(x_1)\braket{O(x_1)}\braket{O(x_2)}J(x_2)-J'(x_1)\braket{O(x_1)}\braket{O(x_2)}J'(x_2)\\
+    &+J(x_1)\braket{O(x_1)}\braket{O(x_2)}J'(x_2)+J'(x_1)\braket{O(x_1)}\braket{O(x_2)}J(x_2).
+\end{split}
+\end{equation}
+\begin{equation*}
+    \begin{split}
+        \delta A[\phi(x),\phi(s')]&=-\int\D^4 x (J[\phi(x)]-J[\phi'(x)])\braket{O(x)}\\&+\frac{\I}{2}\int \D^4x_1\int\D^4 x_2 J(x_1)\braket{\mathcal{T}O(x_1)O(x_2)}_cJ(x_2)+J'(x_1)\braket{\bar{\mathcal{T}}O(x_1)O(x_2)}_cJ'(x_2)
+    -J(x_1)\braket{O(x_1)O(x_2)}_cJ'(x_2)\\&-J'(x_1)\braket{O(x_1)O(x_2)}_cJ(x_2)
+    \end{split}
+\end{equation*}
+Define Wightman function: $W_+(x_1-x_2)=\braket{O(x_1)O(x_2)}-\braket{O(x_1)}\braket{O(x_2)}$, and $W_-(x_1-x_2)=\braket{O(x_2)O(x_1)}-\braket{O(x_1)}\braket{O(x_2)}$. They are conjugate to each other $W^*_+(x_1-x_2)=W_-(x_1-x_2)$. Define:
+\begin{equation}
+    \nu(x_1-x_2)=\operatorname{Re} W_+(x_1-x_2); \eta(x_1-x_2)=\operatorname{Im} W_+(x_1-x_2).
+\end{equation}
+The explicitly form of Wightman function is follow:
+\begin{equation}
+        \begin{split}
+             \delta A[\phi,\phi']=\mathrm{i}\int_0^t \D^4x_1\int_0^{s_1} \D^4x_2(J(x_1)-J'(x_1))\nu(x_1-x_2)(J(x_2)-J'(x_2))+\mathrm{i}(J(x_1)-J'(x_2))\eta(x_1-x_2)(J(x_2)+J'(x_2))\\
+        =\mathrm{i}\int_0^t \D^4x_1\int_0^{s_1} \D^4x_2(\Delta_J(x_1)\nu(x_1-x_2)\Delta_J(x_2)-2\int_0^t \D^4x_1\int_0^{s_1} \D^4x_2(\Delta_J(x_1)\eta(x_1-x
+        _2)\Sigma_J(x_2)\\
+        \text{where}\quad \Delta_J(x)=J[\phi(x)]-J[\phi'(x)],\Sigma_J(x)=\frac{J[\phi(x)]+J[\phi'(x)]}{2}.\label{eq:influence functional field}
+        \end{split}
+    \end{equation}
+Then, we evaluate reduced propagator at time $t+\Delta t$, $J_r[\phi_f,\phi_f';t+\Delta t]$
+
+插入中间场，$\phi_m,\phi_m'$.$\tilde{\phi}(\boldsymbol{x},s)=\frac{\phi_f(\boldsymbol{x})-\phi_m(\boldsymbol{x})}{\Delta t}\cdot(s-t)+\phi_m(\boldsymbol{x})$.
+\begin{equation}
+    \begin{split}
+        J_r[\phi_f,\phi_f',t+\Delta t]=\int\mathcal{D}\phi_m(\boldsymbol{x})\int\mathcal{D}\phi_m'(\boldsymbol{x})\exp{\I\int\D^3 \boldsymbol{x} \frac{1}{2\Delta t}\left[(\phi_f(\boldsymbol{x})-\phi_m(\boldsymbol{x}))^2-(\phi'_f(\boldsymbol{x})-\phi'_m(\boldsymbol{x}))^2\right]}\\
+        \cdot \left(1-\I\int\D \boldsymbol{x}\frac{\Delta t}{2}[(\nabla \phi_m(\boldsymbol{x}))^2+m^2\phi_m^2-(\nabla\phi_m')^2-m^2\phi_m'^2]\right)\\
+        \cdot \int\mathcal{D}\bar{\phi}(x)\mathcal{D}\bar{\phi}'(x) \exp{\I(S[\bar{\phi}]-S[\bar{\phi}'])}\exp{\I\delta A[\bar{\phi},\bar{\phi
+        }';\tilde{\phi},\tilde{\phi}']}
+    \end{split}
+\end{equation}
+For convenience, I call $t_{x_1}=s_1$ and $t_{x_2}=s_2$,$t_x=s$.
+\begin{equation}
+    \begin{split}
+        \delta A[\bar{\phi},\bar{\phi}';\tilde{\phi},\tilde{\phi}']=-2\int_{\boldsymbol{x}_1}\int_{\boldsymbol{x}_2}\int_0^t\D s_1\int_0^{s_1}\D s_2\bar{\Delta}_J(\boldsymbol{x}_1,s_1)\eta(x_1-x_2)\bar{\Sigma}_J(\boldsymbol{x}_2,s_2)\\
+        +\I\int_0^t \D^4 x_1\int_0^{s_1}\D^4 x_2\bar{\Delta}_J(x_1)\nu(x_1-x_2)\bar{\Delta}_J(x_2)\\
+        +\Delta t\left[-2\int_0^t\D^4 x \bar{\Sigma}_J(x)J_{\Sigma}(x)+\I\int_0^t\D^4x\bar{\Delta}_J(x)J_{\Delta}(x)\right]
+    \end{split}
+\end{equation}
+The define of the currents are $J_{\Sigma}(x)=\frac{1}{\Delta t}\int_t^{t+\Delta t}\D x_1 \tilde{\Delta}_J(x_1)\eta(x_1-x)$, and $J_{\Delta}(x)=\frac{1}{\Delta t}\int_t^{t+\Delta t}\D x_1 \tilde{\Delta}_J(x_1)\nu(x_1-x)$. Approximate with first-order accuracy in $\Delta t$, $J_\Sigma(\boldsymbol{x},s)\approx \int \D\boldsymbol{x}_1 \Delta_{J,f}(\boldsymbol{x}_1)\eta(\boldsymbol{x}_1-\boldsymbol{x},t-s),J_{\Delta}(\boldsymbol{x},s)\approx\int\D \boldsymbol{x}_1\Delta_{J,f}(\boldsymbol{x}_1)\nu(\boldsymbol{x}_1-\boldsymbol{x},t-s)$.
+
+\begin{equation}
+    \begin{split}
+        A_0[\Sigma,\Delta]=&\int \D^4 x (\partial_\mu\Delta(x)\partial^\mu\Sigma(x)-m^2\Delta(x)\Sigma(x))\\
+        &-2\int_0^t \D^4 x_1\int_0^{s_1}\D^4 x_2\,\Delta_J(x_1)\eta(x_1-x_2)\Sigma_J(x_2)\\
+        &+\I\int_0^t \D^4 x_1\int_0^{s_1}\D^4 x_2\,\Delta_J(x_1)\nu(x_1-x_2)\Delta_J(x_2)
+    \end{split}
+\end{equation}
+where the $\Delta(x)=\phi(x)-\phi'(x)$,and $\Sigma(x)=\frac{\phi(x)+\phi'(x)}{2}$, which is defferent with $\Delta_J(x)$.
+
+We can express the $\Delta_J/\Sigma_J$ in terms of the original fields $\Delta/\Sigma(x)$ like the case of cubic interaction $\phi_S^3\phi_F$.
+
+For the four-dimensional generalization of \eqref{eq: variation over function}, let
+\[
+I[\Delta,\Sigma]
+=-2\int_0^t \D^4 x_1\int_0^{s_1} \D^4 x_2\,
+f(\Delta(x_1),\Sigma(x_1))\eta(x_1-x_2)g(\Delta(x_2),\Sigma(x_2)),
+\]
+where $x_i=(t_i,\boldsymbol{x}_i)$ and $\D^4 x_i=\D t_i\,\D^3\boldsymbol{x}_i$. Then
+\begin{equation*}
+    \begin{split}
+        \frac{\delta I}{\delta\Delta(x)}
+        =&-2\left[(\partial_\Delta f)(x)\int_0^{s}\D^4 x'\,\eta(x-x')g(x')+(\partial_\Delta g)(x)\int_{s}^{t}\D^4 x'\,f(x')\eta(x'-x)\right],\\
+        \frac{\delta I}{\delta\Sigma(x)}
+        =&-2\left[(\partial_\Sigma f)(x)\int_0^{s}\D^4 x'\,\eta(x-x')g(x')+(\partial_\Sigma g)(x)\int_{s}^{t}\D^4 x'\,f(x')\eta(x'-x)\right].
+    \end{split}
+\end{equation*}
+
+The saddle equations are then generalized to the field case as
+\begin{align}
+    \left(\partial_\mu\partial^\mu+m^2\right)\Sigma_{\mathrm{cl}}(x)+2\left[(\partial_{\Delta}\Delta_{J,\mathrm{cl}})(x)\int_0^{s}\D^4 x_2\,\eta(x-x_2)\Sigma_{J,\mathrm{cl}}(x_2)+(\partial_{\Delta}\Sigma_{J,\mathrm{cl}})(x)\int_s^t \D^4 x_2\,\Delta_{J,\mathrm{cl}}(x_2)\eta(x_2-x)\right]=0,\label{eq:field saddle1}\\
+    \left(\partial_\mu\partial^\mu+m^2\right)\Delta_{\mathrm{cl}}(x)+2\left[(\partial_{\Sigma}\Delta_{J,\mathrm{cl}})(x)\int_0^{s}\D^4 x_2\,\eta(x-x_2)\Sigma_{J,\mathrm{cl}}(x_2)+(\partial_{\Sigma}\Sigma_{J,\mathrm{cl}})(x)\int_s^t \D^4 x_2\,\Delta_{J,\mathrm{cl}}(x_2)\eta(x_2-x)\right]=0,\label{eq:field saddle2}
+\end{align}
+where $\Delta_{J,\mathrm{cl}}=J[\phi_{\mathrm{cl}}]-J[\phi_{\mathrm{cl}}']$. 
+
+\appendix
+\section{Thermal average}
+$$q_n(t)=\sqrt{\frac{\hbar}{2m\omega_n}}(b_n e^{-\I \omega_n t}+b_n^\dagger e^{\I \omega_n t}),$$
+$$\braket{b}_\beta=0\quad,\braket{b^\dagger}_\beta=0.$$
+$$\braket{b_n^\dagger b_n}_\beta=\frac{1}{e^{\hbar\beta\omega_n}-1},\braket{b_n b_n^\dagger}_\beta=\frac{1}{e^{\hbar\beta\omega_n}-1}+1.$$
+$$\braket{q_n(t)q_n(t')}=\frac{\hbar}{2m\omega_n}\braket{(b_n^2 e^{-\I\omega_n (t+t')}+b_n b_n^\dagger e^{-\I\omega_n(t-t')}+b_n^\dagger b_n e^{\I\omega_n(t-t')}+{b_n^\dagger}^2e^{\I\omega_n(t+t')} )}_\beta,$$
+$$\braket{q_n(t)q_n(t)}=\frac{\hbar}{2m\omega_n}\coth\frac{\beta\hbar\omega_n}{2}.$$
+\begin{equation*}
+    \begin{split}
+        \braket{q_n(t)q_n(t')}=&\frac{\hbar}{2m\omega_n}[(\bar{n}+1)e^{-\I\omega_n(t-t')}+\bar{n}e^{\I\omega_n(t-t')}]\\
+        =&\frac{\hbar}{2m\omega_n}[(2\bar{n}+1)\cos \omega_n(t-t')-\I\sin \omega_n(t-t')]\\
+        =&\frac{\hbar}{2m\omega_n}[\coth\frac{\beta\hbar\omega_n}{2}\cos \omega_n(t-t')-\I\sin \omega_n(t-t')]\\
+        \equiv&\nu_n(t-t')+\I\eta_n(t-t').
+    \end{split}
+\end{equation*}
+\end{document}
